@@ -1,9 +1,26 @@
 """Modulo executor que descobre e roda toda a suite de testes."""
 
+import io
 import os
 import sys
 import unittest
 from pathlib import Path
+
+
+def executar_resumo_testes():
+    """Executa toda a suite em modo silencioso e devolve linha de resumo.
+
+    Returns:
+        str: Resumo com total de testes, falhas e erros.
+    """
+    raiz = Path(__file__).resolve().parents[2]
+    if str(raiz) not in sys.path:
+        sys.path.insert(0, str(raiz))
+    suite = _carregar_suite(raiz)
+    res = unittest.TextTestRunner(stream=io.StringIO()).run(suite)
+    falhas = len(res.failures) + len(res.errors)
+    status = "OK" if res.wasSuccessful() else "FALHOU"
+    return f"{res.testsRun} testes | {falhas} falhas/erros ({status})"
 
 
 def executar_todos_os_testes():
